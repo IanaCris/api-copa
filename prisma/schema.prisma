@@ -15,5 +15,19 @@ model Group {
   name       String   @unique
   created_at DateTime @default(now())
 
+  countries Country[]
+
   @@map("groups")
+}
+
+model Country {
+  id String @id @default(uuid())
+  name       String   @unique
+  avatar String?
+  createdAt DateTime @default(now())
+  groupId String
+  group Group @relation(fields: [groupId], references: [id])
+  @@unique([groupId])
+
+  @@map("countries")
 }
