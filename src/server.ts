@@ -2,6 +2,8 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 
 import { groupRoutes } from "./routes/groups";
+import { countriesRoutes } from "./routes/countries";
+import { gamesRoutes } from "./routes/games";
 
 async function bootstrap() {
     const fastify = Fastify({
@@ -13,6 +15,8 @@ async function bootstrap() {
     });
 
     await fastify.register(groupRoutes);
+    await fastify.register(countriesRoutes);
+    await fastify.register(gamesRoutes);
 
 
     await fastify.listen({ port: 3333 });
