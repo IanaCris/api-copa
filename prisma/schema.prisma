@@ -28,7 +28,6 @@ model Country {
   groupId   String
   group     Group    @relation(fields: [groupId], references: [id])
 
-  @@unique([groupId])
   @@map("countries")
 }
 
