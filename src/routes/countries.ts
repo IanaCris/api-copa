@@ -5,7 +5,15 @@ import { prisma } from "../lib/prisma";
 export async function countriesRoutes(fastify: FastifyInstance) {
 
     fastify.get('/countries', async (req, res) => {
-        const countries = await prisma.country.findMany()
+        const countries = await prisma.country.findMany({
+            include: {
+                group: {
+                    select: {
+                        name: true,
+                    }
+                },
+            }
+        })
         return countries
     })
 
