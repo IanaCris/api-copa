@@ -163,7 +163,8 @@ export async function gamesRoutes(fastify: FastifyInstance) {
                     id: game.firstCountryId,
                 },
                 select: {
-                    name: true
+                    name: true,
+                    avatar: true
                 }
             });
             listFC.push(fisrtCountry);
@@ -173,7 +174,8 @@ export async function gamesRoutes(fastify: FastifyInstance) {
                     id: game.secondCountryId,
                 },
                 select: {
-                    name: true
+                    name: true,
+                    avatar: true
                 }
             });
             listSC.push(secondCountry);
@@ -187,6 +189,8 @@ export async function gamesRoutes(fastify: FastifyInstance) {
                 ...game,
                 nameFisrtCountry: listFC[index].name,
                 nameSecondCountry: listSC[index].name,
+                avatarFisrtCountry: listFC[index].avatar,
+                avatarSecondCountry: listSC[index].avatar,
                 dateGame: dateBD.getDate() + "/" + (dateBD.getMonth() + 1),
                 hourGame: (game.date).toISOString().slice(11, 16),
                 dayWeek: dayWeek[dateBD.getDay()]
