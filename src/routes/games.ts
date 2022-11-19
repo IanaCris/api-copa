@@ -1,8 +1,11 @@
 import { FastifyInstance } from "fastify"
 import { z } from "zod"
 import { prisma } from "../lib/prisma"
+import { groupBy } from "lodash";
 
 export async function gamesRoutes(fastify: FastifyInstance) {
+    const dayWeek = new Array("DOMINGO", "SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO");
+
     fastify.get('/games/count', async () => {
         const count = await prisma.game.count()
 
@@ -10,9 +13,11 @@ export async function gamesRoutes(fastify: FastifyInstance) {
     });
 
     fastify.get('/games', async () => {
-        const games = await prisma.game.findMany()
+        const games = await prisma.game.findMany();
 
-        return games;
+        const newListGames = await gameDetails(games);
+
+        return newListGames;
     });
 
     fastify.get('/games/:id', async (request) => {
@@ -22,13 +27,13 @@ export async function gamesRoutes(fastify: FastifyInstance) {
 
         const { id } = getGameParams.parse(request.params)
 
-        const games = await prisma.game.findUnique({
+        const game = await prisma.game.findUnique({
             where: {
                 id,
             }
         })
 
-        return games;
+        return game;
     });
 
     fastify.get('/games/:id/country', async (request) => {
@@ -47,7 +52,9 @@ export async function gamesRoutes(fastify: FastifyInstance) {
             }
         });
 
-        return games;
+        const newListGames = await gameDetails(games);
+
+        return newListGames;
     });
 
     fastify.get('/games/:id/group', async (request) => {
@@ -78,9 +85,9 @@ export async function gamesRoutes(fastify: FastifyInstance) {
             },
         });
 
-        console.log("Jogos", games);
+        const newListGames = await gameDetails(games);
 
-        return games;
+        return newListGames;
     });
 
     fastify.post('/games/date', async (request) => {
@@ -99,9 +106,14 @@ export async function gamesRoutes(fastify: FastifyInstance) {
                     lt: new Date(dateEnd)
                 },
             },
+            orderBy: {
+                date: 'asc',
+            },
         });
 
-        return games;
+        const newListGames = await gameDetails(games);
+
+        return newListGames;
     });
 
     fastify.post('/games', async (request, reply) => {
@@ -140,4 +152,60 @@ export async function gamesRoutes(fastify: FastifyInstance) {
             date
         })
     });
+
+    async function gameDetails(games: IGame[]) {
+        const listFC: any = [];
+        const listSC: any = [];
+
+        for (const [index, game] of games.entries()) {
+            const fisrtCountry = await prisma.country.findFirst({
+                where: {
+                    id: game.firstCountryId,
+                },
+                select: {
+                    name: true
+                }
+            });
+            listFC.push(fisrtCountry);
+
+            const secondCountry = await prisma.country.findFirst({
+                where: {
+                    id: game.secondCountryId,
+                },
+                select: {
+                    name: true
+                }
+            });
+            listSC.push(secondCountry);
+        }
+
+        const gamesMoreDetails = games.map((game, index) => {
+
+            const dateBD = new Date(game.date);
+
+            return {
+                ...game,
+                nameFisrtCountry: listFC[index].name,
+                nameSecondCountry: listSC[index].name,
+                dateGame: dateBD.getDate() + "/" + (dateBD.getMonth() + 1),
+                hourGame: (game.date).toISOString().slice(11, 16),
+                dayWeek: dayWeek[dateBD.getDay()]
+            };
+        });
+
+
+        const newListGames = groupBy(gamesMoreDetails, "dateGame");
+        return newListGames;
+    }
+
+    interface IGame {
+        id: string;
+        date: Date;
+        firstCountryId: string;
+        secondCountryId: string;
+        firstCountryPoints: number;
+        secondCountryPoints: number
+        createdAt: Date;
+        updatedAt: Date;
+    }
 }
