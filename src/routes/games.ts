@@ -127,13 +127,13 @@ export async function gamesRoutes(fastify: FastifyInstance) {
     });
 
     fastify.post('/games', async (request, reply) => {
-        const createCountryBody = z.object({
+        const createGameBody = z.object({
             firstCountryId: z.string(),
             secondCountryId: z.string(),
             date: z.string(),
         })
 
-        const { firstCountryId, secondCountryId, date } = createCountryBody.parse(request.body)
+        const { firstCountryId, secondCountryId, date } = createGameBody.parse(request.body)
 
         try {
 
@@ -160,6 +160,48 @@ export async function gamesRoutes(fastify: FastifyInstance) {
             firstCountryId,
             secondCountryId,
             date
+        })
+    });
+
+    fastify.patch('/games/:id/update', async (request, reply) => {
+
+        const getGameParams = z.object({
+            id: z.string(),
+        });
+
+        const { id } = getGameParams.parse(request.params);
+
+        const updateGameBody = z.object({
+            firstCountryPoints: z.number(),
+            secondCountryPoints: z.number()
+        })
+
+        const { firstCountryPoints, secondCountryPoints } = updateGameBody.parse(request.body);
+
+        try {
+
+            await prisma.game.update({
+                where: { id: id },
+                data: {
+                    firstCountryPoints,
+                    secondCountryPoints
+                }
+            })
+
+        } catch {
+            await prisma.game.update({
+                where: { id: id },
+                data: {
+                    firstCountryPoints,
+                    secondCountryPoints
+                }
+            })
+
+        }
+
+        return reply.status(200).send({
+            firstCountryPoints,
+            secondCountryPoints
         })
     });
 
