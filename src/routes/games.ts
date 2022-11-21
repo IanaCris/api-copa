@@ -13,7 +13,11 @@ export async function gamesRoutes(fastify: FastifyInstance) {
     });
 
     fastify.get('/games', async () => {
-        const games = await prisma.game.findMany();
+        const games = await prisma.game.findMany({
+            orderBy: {
+                date: 'asc',
+            }
+        });
 
         const newListGames = await gameDetails(games);
 
@@ -49,7 +53,10 @@ export async function gamesRoutes(fastify: FastifyInstance) {
                     { firstCountryId: id },
                     { secondCountryId: id },
                 ],
-            }
+            },
+            orderBy: {
+                date: 'asc',
+            },
         });
 
         const newListGames = await gameDetails(games);
@@ -82,6 +89,9 @@ export async function gamesRoutes(fastify: FastifyInstance) {
                         secondCountryId: { in: idsCountries }
                     },
                 ],
+            },
+            orderBy: {
+                date: 'asc',
             },
         });
 
