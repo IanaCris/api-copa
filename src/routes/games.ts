@@ -126,6 +126,45 @@ export async function gamesRoutes(fastify: FastifyInstance) {
         return newListGames;
     });
 
+    fastify.post('/games/country', async (request) => {
+        const createNameCountryBody = z.object({
+            nameCountry: z.string(),
+        });
+
+        const { nameCountry } = createNameCountryBody.parse(request.body);
+
+
+        const countries = await prisma.country.findMany({
+            where: {
+                name: {
+                    contains: nameCountry,
+                }
+            }
+        });
+
+        const idsCountries = countries.map((country) => country.id);
+
+        const games = await prisma.game.findMany({
+            where: {
+                OR: [
+                    {
+                        firstCountryId: { in: idsCountries }
+                    },
+                    {
+                        secondCountryId: { in: idsCountries }
+                    },
+                ],
+            },
+            orderBy: {
+                date: 'asc',
+            },
+        });
+
+        const newListGames = await gameDetails(games);
+
+        return newListGames;
+    });
+
     fastify.post('/games', async (request, reply) => {
         const createGameBody = z.object({
             firstCountryId: z.string(),
