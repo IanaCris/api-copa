@@ -20,7 +20,19 @@ $ git clone https://github.com/IanaCris/api-copa.git
 # Vá até a pasta
 $ cd rentx
 # Instale as dependências
-$ yarn # ou npm install
+$ npm install # ou yarn
 # Cria o banco de dados com prisa client
 $ npx prisma migrate dev
+# Executa a aplicação
+$ npm run dev
 ```
+
+<h1 name="tecnologias">🛠 Tecnologias</h1>
+
+As seguintes ferramentas foram usadas na construção do projeto:
+
+- [Node.js](https://nodejs.org/en/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Fastify](https://www.fastify.io/)
+- [Prisma ORM](https://www.prisma.io/)
+- [SqLite](https://www.sqlite.org/)
