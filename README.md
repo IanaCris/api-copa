@@ -18,7 +18,7 @@ $ git clone https://github.com/IanaCris/api-copa.git
 
 ```bash
 # Vá até a pasta
-$ cd rentx
+$ cd api-copa
 # Instale as dependências
 $ npm install # ou yarn
 # Cria o banco de dados com prisa client
